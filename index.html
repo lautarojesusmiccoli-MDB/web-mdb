@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lubricentro MDB - Historial Digital</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 🎨 VARIABLES DE COLOR (Estilo Fibra de Carbono y Neón) */
+        :root {
+            --azul-marca: #2563eb;
+            --verde-exito: #10b981;
+            --gris-tarjeta: #1e293b;
+            --gris-borde: #334155;
+            --texto-claro: #f8fafc;
+            --texto-mutado: #94a3b8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* 🏁 PATRÓN CSS DE FIBRA DE CARBONO PREMIUM */
+            background-color: #151515;
+            background-image: 
+                linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111), 
+                linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+            background-size: 10px 10px;
+            background-position: 0 0, 5px 5px;
+            
+            margin: 0;
+            padding: 0;
+            color: var(--texto-claro);
+            display: flex;
+            justify-content: center;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: rgba(15, 23, 42, 0.95); /* Gris oscuro profundo semitransparente */
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid #222;
+            border-right: 1px solid #222;
+        }
+
+        /* 🖼️ ENCABEZADO DESTACADO */
+        .hero-header {
+            background: linear-gradient(180deg, #0f172a 0%, rgba(15, 23, 42, 0) 100%);
+            padding: 35px 20px 20px 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--verde-exito);
+        }
+
+        .logo-container img {
+    max-width: 220px; /* ¡Agrandado para mayor impacto! */
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0px 6px 16px rgba(0,0,0,0.6));
+    margin-bottom: 15px;
+    transition: transform 0.3s ease;
+}
+
+/* Efecto profesional cuando el cliente lo toca en el celular */
+.logo-container img:active {
+    transform: scale(0.95);
+}
+
+        .hero-header h2 {
+            margin: 5px 0 0 0;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--texto-claro);
+            text-transform: uppercase;
+        }
+
+        .hero-header .subtitle {
+            color: var(--texto-mutado);
+            font-size: 0.9rem;
+            margin-top: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 🔎 ZONA DE BÚSQUEDA */
+        .content-body {
+            padding: 24px;
+            flex-grow: 1;
+        }
+
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .search-box label {
+            font-weight: 600;
+            color: var(--texto-claro);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .input-container i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--texto-mutado);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 14px 15px 42px;
+            border: 2px solid var(--gris-borde);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-sizing: border-box;
+            background-color: #0f172a;
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--azul-marca);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+        }
+
+        button {
+            background-color: var(--verde-exito);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        button:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+
+        /* 📈 ESTADO DE RESULTADOS */
+        .resultado-status {
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-success { background-color: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; }
+        .status-error { background-color: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); display: flex; }
+        
+        /* 🚗 TARJETAS DE SERVICIOS OSCURAS */
+        .tarjeta {
+            background: var(--gris-tarjeta);
+            border: 1px solid var(--gris-borde);
+            border-left: 6px solid var(--azul-marca);
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 22px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .tarjeta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed var(--gris-borde);
+        }
+
+        .tarjeta-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tarjeta-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 12px 0;
+            font-size: 0.98rem;
+            color: #e2e8f0;
+        }
+
+        .tarjeta-item i {
+            color: var(--azul-marca);
+            width: 16px;
+            margin-top: 3px;
+            text-align: center;
+            font-size: 1.05rem;
+        }
+
+        .tarjeta-item b {
+            color: white;
+            font-weight: 600;
+        }
+
+        .tarjeta-notas {
+            background-color: #0f172a;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 18px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        .tarjeta-notas p {
+            margin: 0;
+            font-size: 0.92rem;
+            color: var(--texto-mutado);
+        }
+        
+        .tarjeta-notas p strong {
+            color: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="hero-header">
+        <div class="logo-container">
+            <img src="logo.png" alt="Lubricentro MDB" onerror="this.style.display='none'">
+        </div>
+        <h2>Lubricentro MDB</h2>
+        <div class="subtitle"><i class="fa-solid fa-screwdriver-wrench"></i> Historial Digital</div>
+    </div>
+
+    <div class="content-body">
+        <div class="search-box">
+            <label for="patente">🔎 Ingresá tu Patente (Dominio):</label>
+            <div class="input-container">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="patente" placeholder="Ej: AA123BB o MNO456">
+            </div>
+            <button onclick="buscarPatente()"><i class="fa-solid fa-engine"></i> Buscar Historial</button>
+        </div>
+
+        <div id="status" class="resultado-status"></div>
+
+        <div id="resultados"></div>
+    </div>
+</div>
+
+<script>
+    // 🔗 Enlace con bypass de CORS para pruebas locales
+    const URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1tmbluBoICGlFbr1OrF4QddSRYCgmy5_4huMZdd06LPY/export?format=csv";
+
+    async function buscarPatente() {
+        const patenteBuscada = document.getElementById("patente").value.replace(/\s+/g, '').toUpperCase();
+        const divStatus = document.getElementById("status");
+        const divResultados = document.getElementById("resultados");
+        
+        divStatus.className = "resultado-status";
+        divStatus.innerHTML = "";
+        divResultados.innerHTML = "";
+
+        if (!patenteBuscada) {
+            divStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Por favor, ingresá una patente.';
+            divStatus.classList.add("status-error");
+            return;
+        }
+
+        try {
+            const response = await fetch(URL_PLANILLA);
+            const csvText = await response.text();
+            
+            const parsed = Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true
+            });
+            
+            const datos = parsed.data;
+
+            if (datos.length === 0) {
+                divStatus.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> La planilla está vacía.';
+                divStatus.classList.add("status-error");
+                return;
+            }
+
+            const nombreColumnaPatante = Object.keys(datos[0]).find(key => key.toLowerCase().trim() === 'patente');
+
+            if (!nombreColumnaPatante) {
+                divStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> No se encontró la columna "Patente" en la planilla.';
+                divStatus.classList.add("status-error");
+                return;
+            }
+
+            const historial = datos.filter(fila => {
+                const patenteFila = String(fila[nombreColumnaPatante] || '').replace(/\s+/g, '').toUpperCase();
+                return patenteFila === patenteBuscada;
+            });
+
+            if (historial.length > 0) {
+                historial.reverse();
+
+                divStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> Se encontraron ${historial.length} servicios para la patente <b>${patenteBuscada}</b>`;
+                divStatus.classList.add("status-success");
+
+                historial.forEach(fila => {
+                    const getValorFlexible = (clavesPosibles, textoVacio = "No especificado") => {
+                        const claveEncontrada = Object.keys(fila).find(k => clavesPosibles.includes(k.toLowerCase().trim()));
+                        const val = claveEncontrada ? String(fila[claveEncontrada]).trim() : "";
+                        return (val === "" || val.toLowerCase() === "nan") ? textoVacio : val;
+                    };
+
+                    const fecha = getValorFlexible(['fecha', 'fecha del servicio']);
+                    const vehiculo = getValorFlexible(['vehiculo', 'vehículo', 'auto']);
+                    const km = getValorFlexible(['km_actual', 'kilometraje', 'km']);
+                    const aceite = getValorFlexible(['aceite_colocado', 'aceite']);
+                    const filtros = getValorFlexible(['filtros_cambiados', 'filtros']);
+                    const otrosServicios = getValorFlexible(['otros servicios realizados', 'otros servicios', 'otros'], 'Sin novedades adicionales');
+                    const notas = getValorFlexible(['notas_proximo_service', 'proximo service', 'notas'], 'Sin observaciones');
+
+                    const tarjetaHTML = `
+                        <div class="tarjeta">
+                            <div class="tarjeta-header">
+                                <h3><i class="fa-solid fa-calendar-days"></i> Fecha: ${fecha}</h3>
+                            </div>
+                            <div class="tarjeta-item">
+                                <i class="fa-solid fa-car"></i>
+                                <span><b>Vehículo:</b> ${vehiculo}</span>
+                            </div>
+                            <div class="tarjeta-item">
+                                <i class="fa-solid fa-gauge"></i>
+                                <span><b>Kilometraje:</b> ${km} km</span>
+                            </div>
+                            <div class="tarjeta-item">
+                                <i class="fa-solid fa-oil-can"></i>
+                                <span><b>Aceite:</b> ${aceite}</span>
+                            </div>
+                            <div class="tarjeta-item">
+                                <i class="fa-solid fa-filter"></i>
+                                <span><b>Filtros cambiados:</b> ${filtros}</span>
+                            </div>
+                            <div class="tarjeta-item">
+                                <i class="fa-solid fa-screwdriver-wrench"></i>
+                                <span><b>Otros servicios:</b> ${otrosServicios}</span>
+                            </div>
+                            <div class="tarjeta-notes">
+                                <p><strong><i class="fa-solid fa-clipboard-list"></i> Próximo Service / Notas:</strong></p>
+                                <p style="margin-top: 5px; color: #f1f5f9;">${notas}</p>
+                            </div>
+                        </div>
+                    `;
+                    divResultados.innerHTML += tarjetaHTML;
+                });
+
+            } else {
+                divStatus.innerHTML = '<i class="fa-solid fa-circle-question"></i> No encontramos registros con esa patente.';
+                divStatus.classList.add("status-error");
+            }
+
+        } catch (error) {
+            divStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error al conectar con la base de datos.';
+            divStatus.classList.add("status-error");
+            console.error(error);
+        }
+    }
+</script>
+
+</body>
+</html>
