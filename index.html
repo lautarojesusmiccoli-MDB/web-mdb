@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lubricentro MDB - Historial Digital</title>
+    <!-- 📦 Librerías esenciales (PapaParse + Iconos FontAwesome) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -56,18 +57,18 @@
         }
 
         .logo-container img {
-    max-width: 220px; /* ¡Agrandado para mayor impacto! */
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0px 6px 16px rgba(0,0,0,0.6));
-    margin-bottom: 15px;
-    transition: transform 0.3s ease;
-}
+            max-width: 220px; /* ¡Agrandado para mayor impacto! */
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0px 6px 16px rgba(0,0,0,0.6));
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
 
-/* Efecto profesional cuando el cliente lo toca en el celular */
-.logo-container img:active {
-    transform: scale(0.95);
-}
+        /* Efecto profesional cuando el cliente lo toca en el celular */
+        .logo-container img:active {
+            transform: scale(0.95);
+        }
 
         .hero-header h2 {
             margin: 5px 0 0 0;
@@ -247,11 +248,81 @@
         .tarjeta-notas p strong {
             color: #f1f5f9;
         }
+
+        /* 🗺️ ESTILOS PARA EL MAPA */
+        .mapa-contenedor {
+            background: var(--gris-tarjeta);
+            border: 1px solid var(--gris-borde);
+            padding: 15px;
+            border-radius: 14px;
+            margin-top: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .mapa-contenedor h4 {
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mapa-responsive {
+            overflow: hidden;
+            padding-bottom: 56.25%;
+            position: relative;
+            height: 0;
+            border-radius: 10px;
+            border: 1px solid var(--gris-borde);
+        }
+
+        .mapa-responsive iframe {
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+
+        /* 💬 BOTÓN FLOTANTE DE WHATSAPP */
+        .btn-whatsapp {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            animation: pulse-green 2s infinite;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #20ba5a;
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
+    <!-- 🖼/🏎️ Encabezado Estilo Fibra de Carbono MDB -->
     <div class="hero-header">
         <div class="logo-container">
             <img src="logo.png" alt="Lubricentro MDB" onerror="this.style.display='none'">
@@ -261,6 +332,7 @@
     </div>
 
     <div class="content-body">
+        <!-- 🔎 Buscador -->
         <div class="search-box">
             <label for="patente">🔎 Ingresá tu Patente (Dominio):</label>
             <div class="input-container">
@@ -270,14 +342,29 @@
             <button onclick="buscarPatente()"><i class="fa-solid fa-engine"></i> Buscar Historial</button>
         </div>
 
+        <!-- Mensajes de estado -->
         <div id="status" class="resultado-status"></div>
 
+        <!-- Contenedor donde aparecerán las tarjetas -->
         <div id="resultados"></div>
+
+        <!-- 🗺️ SECCIÓN DE UBICACIÓN (MAPA REAL) -->
+        <div class="mapa-contenedor">
+            <h4><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> Dónde Estamos</h4>
+            <div class="mapa-responsive">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3375.005916500331!2d-60.98055662545423!3d-32.231007173896565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95b5e70d280c249d%3A0x65cb975dfdd05521!2s9%20de%20Julio%20297%2C%20S2246%20Barrancas%2C%20Santa%20Fe!5e0!3m2!1ses-419!2sar!4v1783596911524!5m2!1ses-419!2sar" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+        </div>
     </div>
 </div>
 
+<!-- 💬 BOTÓN FLOTANTE DE WHATSAPP REAL -->
+<a href="https://wa.me/543466402868?text=Hola%20Lubricentro%20MDB,%20quería%20hacer%20una%20consulta%20por%20un%20turno/servicio." class="btn-whatsapp" target="_blank">
+    <i class="fa-brands fa-whatsapp"></i>
+</a>
+
 <script>
-    // 🔗 Enlace con bypass de CORS para pruebas locales
+    // 🔗 Enlace directo a tu base de datos de Google Sheets sin cors-anywhere
     const URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1tmbluBoICGlFbr1OrF4QddSRYCgmy5_4huMZdd06LPY/export?format=csv";
 
     async function buscarPatente() {
