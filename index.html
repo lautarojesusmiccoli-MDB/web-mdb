@@ -1,757 +1,1368 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Lubricentro MDB - Historial Digital</title>
+
     <!-- 📦 Librerías esenciales (PapaParse + Iconos FontAwesome) -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
+
         /* 🎨 VARIABLES DE COLOR (Estilo Fibra de Carbono y Neón) */
+
         :root {
+
             --azul-marca: #2563eb;
+
             --verde-exito: #10b981;
+
             --gris-tarjeta: #1e293b;
+
             --gris-borde: #334155;
+
             --texto-claro: #f8fafc;
+
             --texto-mutado: #94a3b8;
+
         }
+
+
 
         body {
+
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
             /* 🏁 PATRÓN CSS DE FIBRA DE CARBONO PREMIUM */
+
             background-color: #151515;
+
             background-image: 
+
                 linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111), 
+
                 linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+
             background-size: 10px 10px;
+
             background-position: 0 0, 5px 5px;
+
             
+
             margin: 0;
+
             padding: 0;
+
             color: var(--texto-claro);
+
             display: flex;
+
             justify-content: center;
+
         }
+
+
 
         .wrapper {
+
             width: 100%;
+
             max-width: 480px;
+
             min-height: 100vh;
-            background: rgba(15, 23, 42, 0.95);
+
+            background: rgba(15, 23, 42, 0.95); /* Gris oscuro profundo semitransparente */
+
             backdrop-filter: blur(10px);
+
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+
             display: flex;
+
             flex-direction: column;
+
             border-left: 1px solid #222;
+
             border-right: 1px solid #222;
+
         }
+
+
 
         /* 🖼️ ENCABEZADO DESTACADO */
+
         .hero-header {
+
             background: linear-gradient(180deg, #0f172a 0%, rgba(15, 23, 42, 0) 100%);
+
             padding: 35px 20px 20px 20px;
+
             text-align: center;
+
             border-bottom: 3px solid var(--verde-exito);
+
         }
+
+
 
         .logo-container img {
+
             max-width: 220px;
+
             width: 100%;
+
             height: auto;
+
             filter: drop-shadow(0px 6px 16px rgba(0,0,0,0.6));
+
             margin-bottom: 15px;
+
             transition: transform 0.3s ease;
+
         }
+
+
 
         .logo-container img:active {
+
             transform: scale(0.95);
+
         }
+
+
 
         .hero-header h2 {
+
             margin: 5px 0 0 0;
+
             font-size: 1.6rem;
+
             font-weight: 800;
+
             letter-spacing: 0.5px;
+
             color: var(--texto-claro);
+
             text-transform: uppercase;
+
         }
+
+
 
         .hero-header .subtitle {
+
             color: var(--texto-mutado);
+
             font-size: 0.9rem;
+
             margin-top: 6px;
+
             font-weight: 500;
+
             text-transform: uppercase;
+
             letter-spacing: 1px;
+
         }
+
+
 
         /* 🔎 ZONA DE BÚSQUEDA */
+
         .content-body {
+
             padding: 24px;
+
             flex-grow: 1;
+
         }
+
+
 
         .search-box {
+
             display: flex;
+
             flex-direction: column;
+
             gap: 12px;
+
             margin-bottom: 30px;
+
         }
+
+
 
         .search-box label {
+
             font-weight: 600;
+
             color: var(--texto-claro);
+
             font-size: 0.95rem;
+
             display: flex;
+
             align-items: center;
+
             gap: 8px;
+
         }
+
+
 
         .input-container {
+
             position: relative;
+
         }
+
+
 
         .input-container i {
+
             position: absolute;
+
             left: 14px;
+
             top: 50%;
+
             transform: translateY(-50%);
+
             color: var(--texto-mutado);
+
         }
+
+
 
         input[type="text"], input[type="number"], select {
+
             width: 100%;
+
             padding: 15px 14px 15px 42px;
+
             border: 2px solid var(--gris-borde);
+
             border-radius: 12px;
+
             font-size: 1.1rem;
+
             font-weight: 700;
+
             text-transform: uppercase;
+
             box-sizing: border-box;
+
             background-color: #0f172a;
+
             color: white;
+
             transition: all 0.2s ease;
+
         }
+
+
 
         input[type="text"]:focus, input[type="number"]:focus, select:focus {
+
             outline: none;
+
             border-color: var(--azul-marca);
+
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+
         }
+
+
 
         button {
+
             background-color: var(--verde-exito);
+
             color: white;
+
             border: none;
+
             padding: 15px;
+
             border-radius: 12px;
+
             font-size: 1rem;
+
             font-weight: 700;
+
             text-transform: uppercase;
+
             cursor: pointer;
+
             display: flex;
+
             justify-content: center;
+
             align-items: center;
+
             gap: 10px;
+
             transition: all 0.2s ease;
+
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+
         }
+
+
 
         button:hover {
+
             background-color: #059669;
+
             transform: translateY(-1px);
+
         }
+
+
 
         /* 📈 ESTADO DE RESULTADOS */
+
         .resultado-status {
+
             padding: 14px;
+
             border-radius: 10px;
+
             margin-bottom: 25px;
+
             font-size: 0.95rem;
+
             font-weight: 600;
+
             display: none;
+
             align-items: center;
+
             gap: 10px;
+
         }
+
         .status-success { background-color: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; }
+
         .status-error { background-color: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); display: flex; }
+
         
+
         /* 🚗 TARJETAS DE SERVICIOS OSCURAS */
+
         .tarjeta {
+
             background: var(--gris-tarjeta);
+
             border: 1px solid var(--gris-borde);
+
             border-left: 6px solid var(--azul-marca);
+
             padding: 20px;
+
             border-radius: 14px;
+
             margin-bottom: 22px;
+
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+
         }
+
+
 
         .tarjeta-header {
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
+
             margin-bottom: 15px;
+
             padding-bottom: 12px;
+
             border-bottom: 1px dashed var(--gris-borde);
+
         }
+
+
 
         .tarjeta-header h3 {
+
             margin: 0;
+
             color: white;
+
             font-size: 1.15rem;
+
             font-weight: 700;
+
             display: flex;
+
             align-items: center;
+
             gap: 8px;
+
         }
+
+
 
         .tarjeta-item {
+
             display: flex;
+
             align-items: flex-start;
+
             gap: 12px;
+
             margin: 12px 0;
+
             font-size: 0.98rem;
+
             color: #e2e8f0;
+
         }
+
+
 
         .tarjeta-item i {
+
             color: var(--azul-marca);
+
             width: 16px;
+
             margin-top: 3px;
+
             text-align: center;
+
             font-size: 1.05rem;
+
         }
+
+
 
         .tarjeta-item b {
+
             color: white;
+
             font-weight: 600;
+
         }
+
+
 
         .tarjeta-notas {
+
             background-color: #0f172a;
+
             border-radius: 10px;
+
             padding: 14px;
+
             margin-top: 18px;
+
             border: 1px solid var(--gris-borde);
+
         }
+
+
 
         .tarjeta-notas p {
+
             margin: 0;
+
             font-size: 0.92rem;
+
             color: var(--texto-mutado);
+
         }
+
         
+
         .tarjeta-notas p strong {
+
             color: #f1f5f9;
+
         }
+
+
 
         /* 🗺️ ESTILOS PARA EL MAPA */
+
         .mapa-contenedor {
+
             background: var(--gris-tarjeta);
+
             border: 1px solid var(--gris-borde);
+
             padding: 15px;
+
             border-radius: 14px;
+
             margin-top: 30px;
+
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+
         }
+
+
 
         .mapa-contenedor h4 {
+
             margin: 0 0 12px 0;
+
             font-size: 1rem;
+
             color: white;
+
             display: flex;
+
             align-items: center;
+
             gap: 8px;
+
         }
+
+
 
         .mapa-responsive {
+
             overflow: hidden;
+
             padding-bottom: 56.25%;
+
             position: relative;
+
             height: 0;
+
             border-radius: 10px;
+
             border: 1px solid var(--gris-borde);
+
         }
+
+
 
         .mapa-responsive iframe {
+
             left: 0;
+
             top: 0;
+
             height: 100%;
+
             width: 100%;
+
             position: absolute;
+
         }
+
+
 
         /* 💬 BOTÓN FLOTANTE DE WHATSAPP */
+
         .btn-whatsapp {
+
             position: fixed;
+
             width: 60px;
+
             height: 60px;
+
             bottom: 20px;
+
             right: 20px;
+
             background-color: #25d366;
+
             color: white;
+
             border-radius: 50px;
+
             text-align: center;
+
             font-size: 30px;
+
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4);
+
             z-index: 100;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             cursor: pointer;
+
             transition: all 0.3s ease;
+
             animation: pulse-green 2s infinite;
+
         }
+
+
 
         .btn-whatsapp:hover {
+
             background-color: #20ba5a;
+
             transform: scale(1.1);
+
         }
+
+
 
         /* 📝 PANEL DESPLEGABLE DEL FORMULARIO DE WHATSAPP */
+
         .wsp-modal {
+
             position: fixed;
+
             bottom: 90px;
+
             right: 20px;
+
             width: 320px;
+
             background: #1e293b;
+
             border: 2px solid var(--gris-borde);
+
             border-radius: 16px;
+
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
+
             z-index: 101;
-            display: none;
+
+            display: none; /* Oculto por defecto */
+
             flex-direction: column;
+
             overflow: hidden;
+
             animation: fadeIn 0.3s ease;
+
         }
+
+
 
         .wsp-modal-header {
+
             background: #0f172a;
+
             padding: 15px;
+
             color: white;
+
             font-weight: 700;
+
             font-size: 1rem;
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
+
             border-bottom: 1px solid var(--gris-borde);
+
         }
+
+
 
         .wsp-modal-header i {
+
             cursor: pointer;
+
             color: var(--texto-mutado);
+
         }
+
         .wsp-modal-header i:hover { color: white; }
 
+
+
         .wsp-modal-body {
+
             padding: 15px;
+
             max-height: 380px;
+
             overflow-y: auto;
+
             display: flex;
+
             flex-direction: column;
+
             gap: 12px;
+
         }
+
+
 
         .wsp-opcion-btn {
+
             background: #0f172a;
+
             border: 1px solid var(--gris-borde);
+
             padding: 12px;
+
             border-radius: 8px;
+
             color: white;
+
             font-weight: 600;
+
             text-align: left;
+
             cursor: pointer;
+
             display: flex;
+
             align-items: center;
+
             gap: 10px;
+
             font-size: 0.95rem;
+
             box-shadow: none;
+
         }
+
         .wsp-opcion-btn:hover { background: #233149; }
 
+
+
         .wsp-form-group {
+
             display: flex;
+
             flex-direction: column;
+
             gap: 5px;
+
         }
+
         .wsp-form-group label {
+
             font-size: 0.85rem;
+
             color: var(--texto-mutado);
+
             font-weight: 600;
+
         }
+
         .wsp-form-group input, .wsp-form-group select {
+
             padding: 10px 10px 10px 35px;
+
             font-size: 0.95rem;
+
             border-radius: 8px;
+
         }
+
+
 
         .wsp-form-container {
-            display: none;
+
+            display: none; /* Se muestra solo al elegir turno */
+
             flex-direction: column;
+
             gap: 12px;
+
         }
+
+
 
         @keyframes pulse-green {
+
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+
             70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+
         }
+
         @keyframes fadeIn {
+
             from { opacity: 0; transform: translateY(15px); }
+
             to { opacity: 1; transform: translateY(0); }
+
         }
+
     </style>
+
 </head>
+
 <body>
 
+
+
 <div class="wrapper">
+
     <!-- Encabezado Estilo Fibra de Carbono MDB -->
+
     <div class="hero-header">
+
         <div class="logo-container">
+
             <img src="logo.png" alt="Lubricentro MDB" onerror="this.style.display='none'">
+
         </div>
+
         <h2>Lubricentro MDB</h2>
+
         <div class="subtitle"><i class="fa-solid fa-screwdriver-wrench"></i> Historial Digital</div>
+
     </div>
+
+
 
     <div class="content-body">
+
         <!-- Buscador -->
+
         <div class="search-box">
+
             <label for="patente">🔎 Ingresá tu Patente (Dominio):</label>
+
             <div class="input-container">
+
                 <i class="fa-solid fa-search"></i>
+
                 <input type="text" id="patente" placeholder="Ej: AA123BB o MNO456">
+
             </div>
+
             <button onclick="buscarPatente()"><i class="fa-solid fa-engine"></i> Buscar Historial</button>
+
         </div>
+
+
 
         <!-- Mensajes de estado -->
+
         <div id="status" class="resultado-status"></div>
 
+
+
         <!-- Contenedor donde aparecerán las tarjetas -->
+
         <div id="resultados"></div>
 
+
+
         <!-- SECCIÓN DE UBICACIÓN -->
+
         <div class="mapa-contenedor">
+
             <h4><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> Dónde Estamos</h4>
+
             <div class="mapa-responsive">
+
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3375.005916500331!2d-60.98055662545423!3d-32.231007173896565!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95b5e70d280c249d%3A0x65cb975dfdd05521!2s9%20de%20Julio%20297%2C%20S2246%20Barrancas%2C%20Santa%20Fe!5e0!3m2!1ses-419!2sar!4v1783596911524!5m2!1ses-419!2sar" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
+
 
 <!-- 💬 BOTÓN FLOTANTE DE WHATSAPP -->
+
 <div class="btn-whatsapp" onclick="toggleWspModal()">
+
     <i class="fa-brands fa-whatsapp"></i>
+
 </div>
+
+
 
 <!-- 📝 VENTANA EMERGENTE INTELIGENTE -->
+
 <div id="wspModal" class="wsp-modal">
+
     <div class="wsp-modal-header">
+
         <span><i class="fa-brands fa-whatsapp" style="color: #25d366; margin-right: 5px;"></i> Contacto MDB</span>
+
         <i class="fa-solid fa-xmark" onclick="toggleWspModal()"></i>
+
     </div>
+
     <div class="wsp-modal-body">
+
         <!-- Pantalla inicial: Selección de tipo de consulta -->
+
         <div id="wspOpciones">
+
             <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: var(--texto-claro);">¿En qué podemos ayudarte?</p>
+
             <button class="wsp-opcion-btn" onclick="enviarConsultaGeneral()" style="margin-bottom: 10px; width:100%;">
+
                 <i class="fa-solid fa-comments" style="color: var(--azul-marca);"></i> Consulta General
+
             </button>
+
             <button class="wsp-opcion-btn" onclick="mostrarFormularioTurno()" style="width:100%; background: rgba(16, 185, 129, 0.1); border-color: var(--verde-exito);">
+
                 <i class="fa-solid fa-calendar-check" style="color: var(--verde-exito);"></i> Agendar Turno para Service
+
             </button>
+
         </div>
+
+
 
         <!-- Pantalla secundaria: Formulario de datos para el turno -->
+
         <div id="wspFormContainer" class="wsp-form-container">
+
             <span onclick="volverAOpciones()" style="color: var(--azul-marca); font-size: 0.85rem; cursor: pointer; font-weight: 600;"><i class="fa-solid fa-arrow-left"></i> Volver atrás</span>
+
             
+
             <div class="wsp-form-group">
+
                 <label>Marca:</label>
+
                 <div class="input-container">
+
                     <i class="fa-solid fa-copyright"></i>
+
                     <input type="text" id="wspMarca" placeholder="Ej: Volkswagen, Fiat">
+
                 </div>
+
             </div>
+
             <div class="wsp-form-group">
+
                 <label>Modelo:</label>
+
                 <div class="input-container">
+
                     <i class="fa-solid fa-car-side"></i>
+
                     <input type="text" id="wspModelo" placeholder="Ej: Gol Trend, Cronos">
+
                 </div>
+
             </div>
+
             <div class="wsp-form-group">
+
                 <label>Año:</label>
+
                 <div class="input-container">
+
                     <i class="fa-solid fa-calendar"></i>
+
                     <input type="number" id="wspAnio" placeholder="Ej: 2018">
+
                 </div>
+
             </div>
+
             <div class="wsp-form-group">
+
                 <label>Motor:</label>
+
                 <div class="input-container">
+
                     <i class="fa-solid fa-gavel"></i>
+
                     <input type="text" id="wspMotor" placeholder="Ej: 1.4, 1.6, 2.0 TDI">
+
                 </div>
+
             </div>
+
             <div class="wsp-form-group">
+
                 <label>Tipo de Combustible:</label>
+
                 <div class="input-container">
+
                     <i class="fa-solid fa-gas-pump"></i>
+
                     <select id="wspCombustible" style="padding-left: 35px;">
+
                         <option value="Nafta">Nafta</option>
+
                         <option value="Diesel / Gasoil">Diesel / Gasoil</option>
+
                         <option value="GNC">GNC</option>
+
                         <option value="Híbrido / Eléctrico">Híbrido / Eléctrico</option>
+
                     </select>
+
                 </div>
+
             </div>
+
             <button onclick="enviarTurnoWhatsApp()" style="margin-top: 5px;"><i class="fa-brands fa-whatsapp"></i> Solicitar Turno</button>
+
         </div>
+
     </div>
+
 </div>
 
+
+
 <script>
+
     const URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1tmbluBoICGlFbr1OrF4QddSRYCgmy5_4huMZdd06LPY/export?format=csv";
-    const CATALOGO_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQC8CADIUbp40KF6mqm1iZcnMEVPpwPDalc3fPNllLIoGaK5yR5VdsqLv6HUh3I8QdAgzwplH3PZOy9/pub?gid=545519876&single=true&output=csv";
+
     const TELEFONO_WHATSAPP = "543466402868";
 
+
+
     // 📱 LÓGICA DE LA VENTANA DE WHATSAPP
+
     function toggleWspModal() {
+
         const modal = document.getElementById("wspModal");
+
         if (modal.style.display === "flex") {
+
             modal.style.display = "none";
+
             volverAOpciones();
+
         } else {
+
             modal.style.display = "flex";
+
         }
+
     }
+
+
 
     function mostrarFormularioTurno() {
+
         document.getElementById("wspOpciones").style.display = "none";
+
         document.getElementById("wspFormContainer").style.display = "flex";
+
     }
+
+
 
     function volverAOpciones() {
+
         document.getElementById("wspFormContainer").style.display = "none";
+
         document.getElementById("wspOpciones").style.display = "block";
+
     }
+
+
 
     function enviarConsultaGeneral() {
+
         const texto = encodeURIComponent("Hola Lubricentro MDB, quería hacer una consulta general.");
+
         window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${texto}`, '_blank');
+
         toggleWspModal();
+
     }
 
-    async function enviarTurnoWhatsApp() {
-    const marca = document.getElementById("wspMarca").value.trim().toLowerCase();
-    const modelo = document.getElementById("wspModelo").value.trim().toLowerCase();
-    const anio = document.getElementById("wspAnio").value.trim();
-    const motor = document.getElementById("wspMotor").value.trim().toLowerCase();
-    const combustible = document.getElementById("wspCombustible").value;
 
-    if (!marca || !modelo || !anio || !motor) {
-        alert("Por favor, completa todos los datos de tu vehículo para poder agendar el turno.");
-        return;
-    }
 
-    let datosTecnicosTexto = "\n\n🛠️ *Especificaciones para Taller:*\n• Filtros/Aceite: No figuran en catálogo (verificar manualmente)";
+    function enviarTurnoWhatsApp() {
 
-    try {
-        const response = await fetch(CATALOGO_CSV_URL);
-        const csvText = await response.text();
-        
-        const parsed = Papa.parse(csvText, {
-            header: true,
-            skipEmptyLines: true
-        });
+        const marca = document.getElementById("wspMarca").value.trim();
 
-        const catalogo = parsed.data || [];
+        const modelo = document.getElementById("wspModelo").value.trim();
 
-        // Búsqueda segura y flexible
-        const coincidencia = catalogo.find(item => {
-            if (!item) return false;
-            
-            // Buscar claves sin importar mayúsculas en los encabezados
-            const keys = Object.keys(item);
-            const keyMarca = keys.find(k => k.toLowerCase().trim() === 'marca');
-            const keyModelo = keys.find(k => k.toLowerCase().trim() === 'modelo');
-            const keyMotor = keys.find(k => k.toLowerCase().trim() === 'motor');
+        const anio = document.getElementById("wspAnio").value.trim();
 
-            const marcaItem = keyMarca && item[keyMarca] ? String(item[keyMarca]).toLowerCase().trim() : '';
-            const modeloItem = keyModelo && item[keyModelo] ? String(item[keyModelo]).toLowerCase().trim() : '';
-            const motorItem = keyMotor && item[keyMotor] ? String(item[keyMotor]).toLowerCase().trim() : '';
+        const motor = document.getElementById("wspMotor").value.trim();
 
-            const matchMarca = marcaItem.includes(marca) || marca.includes(marcaItem);
-            const matchModelo = modeloItem.includes(modelo) || modelo.includes(modeloItem);
-            const matchMotor = !motor || motorItem.includes(motor) || motor.includes(motorItem);
+        const combustible = document.getElementById("wspCombustible").value;
 
-            return matchMarca && matchModelo && matchMotor;
-        });
 
-        if (coincidencia) {
-            // Función ultra-segura para extraer valores de columnas
-            const getCampo = (nombresPosibles) => {
-                try {
-                    const keys = Object.keys(coincidencia);
-                    const claveEncontrada = keys.find(k => 
-                        nombresPosibles.some(n => k.toLowerCase().trim() === n.toLowerCase().trim())
-                    );
-                    if (claveEncontrada && coincidencia[claveEncontrada]) {
-                        const val = String(coincidencia[claveEncontrada]).trim();
-                        return val !== '' ? val : 'N/A';
-                    }
-                } catch (e) {
-                    console.error("Error leyendo campo:", e);
-                }
-                return 'N/A';
-            };
 
-            const viscosidad = getCampo(['viscosidad', 'aceite']);
-            const capacidad = getCampo(['capacidad(l)', 'capacidad', 'litros']);
-            const fAceite = getCampo(['f_aceite', 'filtro aceite', 'filtro_aceite']);
-            const fAire = getCampo(['f_aire', 'filtro aire', 'filtro_aire']);
-            const fCombustible = getCampo(['f_combustible', 'filtro combustible', 'filtro_combustible']);
-            const fHabitaculo = getCampo(['f_habitáculo', 'f_habitaculo', 'filtro habitaculo', 'filtro_habitaculo']);
-            const cajaAuto = getCampo(['caja_automática', 'caja_automatica', 'caja automatica']);
+        if (!marca || !modelo || !anio || !motor) {
 
-            datosTecnicosTexto = `\n\n🛠️ *Especificaciones para Taller (Catálogo):*
-• *Viscosidad:* ${viscosidad}
-• *Capacidad:* ${capacidad} L
-• *F. Aceite:* ${fAceite}
-• *F. Aire:* ${fAire}
-• *F. Combustible:* ${fCombustible}
-• *F. Habitáculo:* ${fHabitaculo}
-• *Caja Auto:* ${cajaAuto}`;
+            alert("Por favor, completa todos los datos de tu vehículo para poder agendar el turno.");
+
+            return;
+
         }
-    } catch (error) {
-        console.error("Error al consultar el catálogo de filtros:", error);
+
+
+
+        const mensajeOriginal = `Hola Lubricentro MDB, quiero pedir un turno para un service. \n\n📋 *Datos de mi vehículo:*\n• *Marca:* ${marca}\n• *Modelo:* ${modelo}\n• *Año:* ${anio}\n• *Motor:* ${motor}\n• *Combustible:* ${combustible}`;
+
+        const textoEncriptado = encodeURIComponent(mensajeOriginal);
+
+        
+
+        window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${textoEncriptado}`, '_blank');
+
+        toggleWspModal();
+
     }
 
-    const mensajeOriginal = `Hola Lubricentro MDB, quiero pedir un turno para un service. \n\n📋 *Datos de mi vehículo:*\n• *Marca:* \({marca.toUpperCase()}\n• *Modelo:*\){modelo.toUpperCase()}\n• *Año:* \({anio}\n• *Motor:*\){motor.toUpperCase()}\n• *Combustible:* \({combustible}\){datosTecnicosTexto}`;
-    const textoEncriptado = encodeURIComponent(mensajeOriginal);
-    
-    window.open(`https://wa.me/\({TELEFONO_WHATSAPP}?text=\){textoEncriptado}`, '_blank');
-    toggleWspModal();
-}
-}    // 🔎 LÓGICA DEL BUSCADOR DE PATENTES
+
+
+    // 🔎 LÓGICA DEL BUSCADOR DE PATENTES
+
     async function buscarPatente() {
+
         const patenteBuscada = document.getElementById("patente").value.replace(/\s+/g, '').toUpperCase();
+
         const divStatus = document.getElementById("status");
+
         const divResultados = document.getElementById("resultados");
+
         
+
         divStatus.className = "resultado-status";
+
         divStatus.innerHTML = "";
+
         divResultados.innerHTML = "";
 
+
+
         if (!patenteBuscada) {
+
             divStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Por favor, ingresá una patente.';
+
             divStatus.classList.add("status-error");
+
             return;
+
         }
 
+
+
         try {
+
             const response = await fetch(URL_PLANILLA);
+
             const csvText = await response.text();
+
             
+
             const parsed = Papa.parse(csvText, {
+
                 header: true,
+
                 skipEmptyLines: true
+
             });
+
             
+
             const datos = parsed.data;
 
+
+
             if (datos.length === 0) {
+
                 divStatus.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> La planilla está vacía.';
+
                 divStatus.classList.add("status-error");
+
                 return;
+
             }
+
+
 
             const nombreColumnaPatante = Object.keys(datos[0]).find(key => key.toLowerCase().trim() === 'patente');
 
+
+
             if (!nombreColumnaPatante) {
+
                 divStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> No se encontró la columna "Patente" en la planilla.';
+
                 divStatus.classList.add("status-error");
+
                 return;
+
             }
+
+
 
             const historial = datos.filter(fila => {
+
                 const patenteFila = String(fila[nombreColumnaPatante] || '').replace(/\s+/g, '').toUpperCase();
+
                 return patenteFila === patenteBuscada;
+
             });
 
+
+
             if (historial.length > 0) {
+
                 historial.reverse();
 
+
+
                 divStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> Se encontraron ${historial.length} servicios para la patente <b>${patenteBuscada}</b>`;
+
                 divStatus.classList.add("status-success");
 
+
+
                 historial.forEach(fila => {
+
                     const getValorFlexible = (clavesPosibles, textoVacio = "No especificado") => {
+
                         const claveEncontrada = Object.keys(fila).find(k => clavesPosibles.includes(k.toLowerCase().trim()));
+
                         const val = claveEncontrada ? String(fila[claveEncontrada]).trim() : "";
+
                         return (val === "" || val.toLowerCase() === "nan") ? textoVacio : val;
+
                     };
 
+
+
                     const fecha = getValorFlexible(['fecha', 'fecha del servicio']);
+
                     const vehiculo = getValorFlexible(['vehiculo', 'vehículo', 'auto']);
+
                     const km = getValorFlexible(['km_actual', 'kilometraje', 'km']);
+
                     const aceite = getValorFlexible(['aceite_colocado', 'aceite']);
+
                     const filtros = getValorFlexible(['filtros_cambiados', 'filtros']);
+
                     const otrosServicios = getValorFlexible(['otros servicios realizados', 'otros servicios', 'otros'], 'Sin novedades adicionales');
+
                     const notas = getValorFlexible(['notas_proximo_service', 'proximo service', 'notas'], 'Sin observaciones');
 
+
+
                     const tarjetaHTML = `
+
                         <div class="tarjeta">
+
                             <div class="tarjeta-header">
+
                                 <h3><i class="fa-solid fa-calendar-days"></i> Fecha: ${fecha}</h3>
+
                             </div>
+
                             <div class="tarjeta-item">
+
                                 <i class="fa-solid fa-car"></i>
+
                                 <span><b>Vehículo:</b> ${vehiculo}</span>
+
                             </div>
+
                             <div class="tarjeta-item">
+
                                 <i class="fa-solid fa-gauge"></i>
+
                                 <span><b>Kilometraje:</b> ${km} km</span>
+
                             </div>
+
                             <div class="tarjeta-item">
+
                                 <i class="fa-solid fa-oil-can"></i>
+
                                 <span><b>Aceite:</b> ${aceite}</span>
+
                             </div>
+
                             <div class="tarjeta-item">
+
                                 <i class="fa-solid fa-filter"></i>
+
                                 <span><b>Filtros cambiados:</b> ${filtros}</span>
+
                             </div>
+
                             <div class="tarjeta-item">
+
                                 <i class="fa-solid fa-screwdriver-wrench"></i>
+
                                 <span><b>Otros servicios:</b> ${otrosServicios}</span>
+
                             </div>
-                            <div class="tarjeta-notas">
+
+                            <div class="tarjeta-notes">
+
                                 <p><strong><i class="fa-solid fa-clipboard-list"></i> Próximo Service / Notas:</strong></p>
+
                                 <p style="margin-top: 5px; color: #f1f5f9;">${notas}</p>
+
                             </div>
+
                         </div>
+
                     `;
+
                     divResultados.innerHTML += tarjetaHTML;
+
                 });
 
+
+
             } else {
+
                 divStatus.innerHTML = '<i class="fa-solid fa-circle-question"></i> No encontramos registros con esa patente.';
+
                 divStatus.classList.add("status-error");
+
             }
 
+
+
         } catch (error) {
+
             divStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error al conectar con la base de datos.';
+
             divStatus.classList.add("status-error");
+
             console.error(error);
+
         }
+
     }
+
 </script>
 
+
+
 </body>
-</html>
+
+</html> 
+
