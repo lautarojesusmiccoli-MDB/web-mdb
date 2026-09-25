@@ -571,13 +571,21 @@
             skipEmptyLines: true
         });
 
-        const catalogo = parsed.data;
+        const catalogo = parsed.data || [];
 
-        // Búsqueda flexible parcial de marca, modelo y motor
+        // Búsqueda segura y flexible
         const coincidencia = catalogo.find(item => {
-            const marcaItem = String(item['Marca'] || item['MARCA'] || '').toLowerCase();
-            const modeloItem = String(item['Modelo'] || item['MODELO'] || '').toLowerCase();
-            const motorItem = String(item['Motor'] || item['MOTOR'] || '').toLowerCase();
+            if (!item) return false;
+            
+            // Buscar claves sin importar mayúsculas en los encabezados
+            const keys = Object.keys(item);
+            const keyMarca = keys.find(k => k.toLowerCase().trim() === 'marca');
+            const keyModelo = keys.find(k => k.toLowerCase().trim() === 'modelo');
+            const keyMotor = keys.find(k => k.toLowerCase().trim() === 'motor');
+
+            const marcaItem = keyMarca && item[keyMarca] ? String(item[keyMarca]).toLowerCase().trim() : '';
+            const modeloItem = keyModelo && item[keyModelo] ? String(item[keyModelo]).toLowerCase().trim() : '';
+            const motorItem = keyMotor && item[keyMotor] ? String(item[keyMotor]).toLowerCase().trim() : '';
 
             const matchMarca = marcaItem.includes(marca) || marca.includes(marcaItem);
             const matchModelo = modeloItem.includes(modelo) || modelo.includes(modeloItem);
@@ -587,21 +595,39 @@
         });
 
         if (coincidencia) {
+            // Función ultra-segura para extraer valores de columnas
             const getCampo = (nombresPosibles) => {
-                const clave = Object.keys(coincidencia).find(k => 
-                    nombresPosibles.some(n => k.toLowerCase().trim() === n.toLowerCase().trim())
-                );
-                return (clave && coincidencia[clave] && coincidencia[clave].trim() !== '') ? coincidencia[clave].trim() : 'N/A';
+                try {
+                    const keys = Object.keys(coincidencia);
+                    const claveEncontrada = keys.find(k => 
+                        nombresPosibles.some(n => k.toLowerCase().trim() === n.toLowerCase().trim())
+                    );
+                    if (claveEncontrada && coincidencia[claveEncontrada]) {
+                        const val = String(coincidencia[claveEncontrada]).trim();
+                        return val !== '' ? val : 'N/A';
+                    }
+                } catch (e) {
+                    console.error("Error leyendo campo:", e);
+                }
+                return 'N/A';
             };
 
+            const viscosidad = getCampo(['viscosidad', 'aceite']);
+            const capacidad = getCampo(['capacidad(l)', 'capacidad', 'litros']);
+            const fAceite = getCampo(['f_aceite', 'filtro aceite', 'filtro_aceite']);
+            const fAire = getCampo(['f_aire', 'filtro aire', 'filtro_aire']);
+            const fCombustible = getCampo(['f_combustible', 'filtro combustible', 'filtro_combustible']);
+            const fHabitaculo = getCampo(['f_habitáculo', 'f_habitaculo', 'filtro habitaculo', 'filtro_habitaculo']);
+            const cajaAuto = getCampo(['caja_automática', 'caja_automatica', 'caja automatica']);
+
             datosTecnicosTexto = `\n\n🛠️ *Especificaciones para Taller (Catálogo):*
-• *Viscosidad:* ${getCampo(['Viscosidad', 'Aceite'])}
-• *Capacidad:* ${getCampo(['Capacidad(L)', 'Capacidad', 'LITROS'])} L
-• *F. Aceite:* ${getCampo(['F_Aceite', 'Filtro Aceite', 'Filtro_Aceite'])}
-• *F. Aire:* ${getCampo(['F_Aire', 'Filtro Aire', 'Filtro_Aire'])}
-• *F. Combustible:* ${getCampo(['F_Combustible', 'Filtro Combustible', 'Filtro_Combustible'])}
-• *F. Habitáculo:* ${getCampo(['F_Habitáculo', 'Filtro Habitaculo', 'F_Habitaculo'])}
-• *Caja Auto:* ${getCampo(['Caja_Automática', 'Caja Automatica', 'Caja_Automatica'])}`;
+• *Viscosidad:* ${viscosidad}
+• *Capacidad:* ${capacidad} L
+• *F. Aceite:* ${fAceite}
+• *F. Aire:* ${fAire}
+• *F. Combustible:* ${fCombustible}
+• *F. Habitáculo:* ${fHabitaculo}
+• *Caja Auto:* ${cajaAuto}`;
         }
     } catch (error) {
         console.error("Error al consultar el catálogo de filtros:", error);
@@ -612,6 +638,7 @@
     
     window.open(`https://wa.me/\({TELEFONO_WHATSAPP}?text=\){textoEncriptado}`, '_blank');
     toggleWspModal();
+}
 }    // 🔎 LÓGICA DEL BUSCADOR DE PATENTES
     async function buscarPatente() {
         const patenteBuscada = document.getElementById("patente").value.replace(/\s+/g, '').toUpperCase();
