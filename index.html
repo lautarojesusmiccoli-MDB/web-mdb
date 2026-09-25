@@ -573,11 +573,11 @@
 
         const catalogo = parsed.data;
 
-        // Búsqueda flexible comparando palabras claves
+        // Búsqueda flexible parcial de marca, modelo y motor
         const coincidencia = catalogo.find(item => {
-            const marcaItem = String(item['Marca'] || '').toLowerCase().trim();
-            const modeloItem = String(item['Modelo'] || '').toLowerCase().trim();
-            const motorItem = String(item['Motor'] || '').toLowerCase().trim();
+            const marcaItem = String(item['Marca'] || item['MARCA'] || '').toLowerCase();
+            const modeloItem = String(item['Modelo'] || item['MODELO'] || '').toLowerCase();
+            const motorItem = String(item['Motor'] || item['MOTOR'] || '').toLowerCase();
 
             const matchMarca = marcaItem.includes(marca) || marca.includes(marcaItem);
             const matchModelo = modeloItem.includes(modelo) || modelo.includes(modeloItem);
@@ -587,7 +587,6 @@
         });
 
         if (coincidencia) {
-            // Función auxiliar para buscar nombres de columnas sin importar diferencias pequeñas de formato
             const getCampo = (nombresPosibles) => {
                 const clave = Object.keys(coincidencia).find(k => 
                     nombresPosibles.some(n => k.toLowerCase().trim() === n.toLowerCase().trim())
@@ -596,13 +595,13 @@
             };
 
             datosTecnicosTexto = `\n\n🛠️ *Especificaciones para Taller (Catálogo):*
-• *Viscosidad:* ${getCampo(['Viscosidad'])}
-• *Capacidad:* ${getCampo(['Capacidad(L)', 'Capacidad'])} L
-• *F. Aceite:* ${getCampo(['F_Aceite', 'Filtro Aceite'])}
-• *F. Aire:* ${getCampo(['F_Aire', 'Filtro Aire'])}
-• *F. Combustible:* ${getCampo(['F_Combustible', 'Filtro Combustible'])}
+• *Viscosidad:* ${getCampo(['Viscosidad', 'Aceite'])}
+• *Capacidad:* ${getCampo(['Capacidad(L)', 'Capacidad', 'LITROS'])} L
+• *F. Aceite:* ${getCampo(['F_Aceite', 'Filtro Aceite', 'Filtro_Aceite'])}
+• *F. Aire:* ${getCampo(['F_Aire', 'Filtro Aire', 'Filtro_Aire'])}
+• *F. Combustible:* ${getCampo(['F_Combustible', 'Filtro Combustible', 'Filtro_Combustible'])}
 • *F. Habitáculo:* ${getCampo(['F_Habitáculo', 'Filtro Habitaculo', 'F_Habitaculo'])}
-• *Caja Auto:* ${getCampo(['Caja_Automática', 'Caja Automatica'])}`;
+• *Caja Auto:* ${getCampo(['Caja_Automática', 'Caja Automatica', 'Caja_Automatica'])}`;
         }
     } catch (error) {
         console.error("Error al consultar el catálogo de filtros:", error);
@@ -613,8 +612,7 @@
     
     window.open(`https://wa.me/\({TELEFONO_WHATSAPP}?text=\){textoEncriptado}`, '_blank');
     toggleWspModal();
-}
-    // 🔎 LÓGICA DEL BUSCADOR DE PATENTES
+}    // 🔎 LÓGICA DEL BUSCADOR DE PATENTES
     async function buscarPatente() {
         const patenteBuscada = document.getElementById("patente").value.replace(/\s+/g, '').toUpperCase();
         const divStatus = document.getElementById("status");
