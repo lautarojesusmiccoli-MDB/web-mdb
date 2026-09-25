@@ -39,7 +39,7 @@
             width: 100%;
             max-width: 480px;
             min-height: 100vh;
-            background: rgba(15, 23, 42, 0.95); /* Gris oscuro profundo semitransparente */
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(10px);
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
             display: flex;
@@ -322,7 +322,7 @@
             border-radius: 16px;
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
             z-index: 101;
-            display: none; /* Oculto por defecto */
+            display: none;
             flex-direction: column;
             overflow: hidden;
             animation: fadeIn 0.3s ease;
@@ -389,7 +389,7 @@
         }
 
         .wsp-form-container {
-            display: none; /* Se muestra solo al elegir turno */
+            display: none;
             flex-direction: column;
             gap: 12px;
         }
@@ -518,6 +518,7 @@
 
 <script>
     const URL_PLANILLA = "https://docs.google.com/spreadsheets/d/1tmbluBoICGlFbr1OrF4QddSRYCgmy5_4huMZdd06LPY/export?format=csv";
+    const CATALOGO_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQC8CADIUbp40KF6mqm1iZcnMEVPpwPDalc3fPNllLIoGaK5yR5VdsqLv6HUh3I8QdAgzwplH3PZOy9/pub?gid=545519876&single=true&output=csv";
     const TELEFONO_WHATSAPP = "543466402868";
 
     // 📱 LÓGICA DE LA VENTANA DE WHATSAPP
@@ -547,7 +548,7 @@
         toggleWspModal();
     }
 
-    function enviarTurnoWhatsApp() {
+    async function enviarTurnoWhatsApp() {
         const marca = document.getElementById("wspMarca").value.trim();
         const modelo = document.getElementById("wspModelo").value.trim();
         const anio = document.getElementById("wspAnio").value.trim();
@@ -559,7 +560,48 @@
             return;
         }
 
-        const mensajeOriginal = `Hola Lubricentro MDB, quiero pedir un turno para un service. \n\n📋 *Datos de mi vehículo:*\n• *Marca:* ${marca}\n• *Modelo:* ${modelo}\n• *Año:* ${anio}\n• *Motor:* ${motor}\n• *Combustible:* ${combustible}`;
+        let datosTecnicosTexto = "\n\n🛠️ *Especificaciones para Taller:*\n• Filtros/Aceite: No figuran en catálogo (verificar manualmente)";
+
+        try {
+            const response = await fetch(CATALOGO_CSV_URL);
+            const csvText = await response.text();
+            
+            const parsed = Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true
+            });
+
+            const catalogo = parsed.data;
+
+            const coincidencia = catalogo.find(item => {
+                const marcaItem = String(item['Marca'] || '').toLowerCase();
+                const modeloItem = String(item['Modelo'] || '').toLowerCase();
+                const motorItem = String(item['Motor'] || '').toLowerCase();
+
+                const coincideMarca = marcaItem.includes(marca.toLowerCase()) || marca.toLowerCase().includes(marcaItem);
+                const coincideModelo = modeloItem.includes(modelo.toLowerCase()) || modelo.toLowerCase().includes(modeloItem);
+                const coincideMotor = !motor || motorItem.includes(motor.toLowerCase()) || motor.toLowerCase().includes(motorItem);
+
+                return coincideMarca && coincideModelo && coincideMotor;
+            });
+
+            if (coincidencia) {
+                const getCampo = (nombre) => coincidencia[nombre] && coincidencia[nombre].trim() !== '' ? coincidencia[nombre].trim() : 'N/A';
+
+                datosTecnicosTexto = `\n\n🛠️ *Especificaciones para Taller (Catálogo):*
+• *Viscosidad:* ${getCampo('Viscosidad')}
+• *Capacidad:* ${getCampo('Capacidad(L)')} L
+• *F. Aceite:* ${getCampo('F_Aceite')}
+• *F. Aire:* ${getCampo('F_Aire')}
+• *F. Combustible:* ${getCampo('F_Combustible')}
+• *F. Habitáculo:* ${getCampo('F_Habitáculo')}
+• *Caja Auto:* ${getCampo('Caja_Automática')}`;
+            }
+        } catch (error) {
+            console.error("Error al consultar el catálogo de filtros:", error);
+        }
+
+        const mensajeOriginal = `Hola Lubricentro MDB, quiero pedir un turno para un service. \n\n📋 *Datos de mi vehículo:*\n• *Marca:* ${marca}\n• *Modelo:* ${modelo}\n• *Año:* ${anio}\n• *Motor:* ${motor}\n• *Combustible:* ${combustible}${datosTecnicosTexto}`;
         const textoEncriptado = encodeURIComponent(mensajeOriginal);
         
         window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${textoEncriptado}`, '_blank');
@@ -658,7 +700,7 @@
                                 <i class="fa-solid fa-screwdriver-wrench"></i>
                                 <span><b>Otros servicios:</b> ${otrosServicios}</span>
                             </div>
-                            <div class="tarjeta-notes">
+                            <div class="tarjeta-notas">
                                 <p><strong><i class="fa-solid fa-clipboard-list"></i> Próximo Service / Notas:</strong></p>
                                 <p style="margin-top: 5px; color: #f1f5f9;">${notas}</p>
                             </div>
