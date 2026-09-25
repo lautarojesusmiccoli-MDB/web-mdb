@@ -549,65 +549,71 @@
     }
 
     async function enviarTurnoWhatsApp() {
-        const marca = document.getElementById("wspMarca").value.trim();
-        const modelo = document.getElementById("wspModelo").value.trim();
-        const anio = document.getElementById("wspAnio").value.trim();
-        const motor = document.getElementById("wspMotor").value.trim();
-        const combustible = document.getElementById("wspCombustible").value;
+    const marca = document.getElementById("wspMarca").value.trim().toLowerCase();
+    const modelo = document.getElementById("wspModelo").value.trim().toLowerCase();
+    const anio = document.getElementById("wspAnio").value.trim();
+    const motor = document.getElementById("wspMotor").value.trim().toLowerCase();
+    const combustible = document.getElementById("wspCombustible").value;
 
-        if (!marca || !modelo || !anio || !motor) {
-            alert("Por favor, completa todos los datos de tu vehículo para poder agendar el turno.");
-            return;
-        }
-
-        let datosTecnicosTexto = "\n\n🛠️ *Especificaciones para Taller:*\n• Filtros/Aceite: No figuran en catálogo (verificar manualmente)";
-
-        try {
-            const response = await fetch(CATALOGO_CSV_URL);
-            const csvText = await response.text();
-            
-            const parsed = Papa.parse(csvText, {
-                header: true,
-                skipEmptyLines: true
-            });
-
-            const catalogo = parsed.data;
-
-            const coincidencia = catalogo.find(item => {
-                const marcaItem = String(item['Marca'] || '').toLowerCase();
-                const modeloItem = String(item['Modelo'] || '').toLowerCase();
-                const motorItem = String(item['Motor'] || '').toLowerCase();
-
-                const coincideMarca = marcaItem.includes(marca.toLowerCase()) || marca.toLowerCase().includes(marcaItem);
-                const coincideModelo = modeloItem.includes(modelo.toLowerCase()) || modelo.toLowerCase().includes(modeloItem);
-                const coincideMotor = !motor || motorItem.includes(motor.toLowerCase()) || motor.toLowerCase().includes(motorItem);
-
-                return coincideMarca && coincideModelo && coincideMotor;
-            });
-
-            if (coincidencia) {
-                const getCampo = (nombre) => coincidencia[nombre] && coincidencia[nombre].trim() !== '' ? coincidencia[nombre].trim() : 'N/A';
-
-                datosTecnicosTexto = `\n\n🛠️ *Especificaciones para Taller (Catálogo):*
-• *Viscosidad:* ${getCampo('Viscosidad')}
-• *Capacidad:* ${getCampo('Capacidad(L)')} L
-• *F. Aceite:* ${getCampo('F_Aceite')}
-• *F. Aire:* ${getCampo('F_Aire')}
-• *F. Combustible:* ${getCampo('F_Combustible')}
-• *F. Habitáculo:* ${getCampo('F_Habitáculo')}
-• *Caja Auto:* ${getCampo('Caja_Automática')}`;
-            }
-        } catch (error) {
-            console.error("Error al consultar el catálogo de filtros:", error);
-        }
-
-        const mensajeOriginal = `Hola Lubricentro MDB, quiero pedir un turno para un service. \n\n📋 *Datos de mi vehículo:*\n• *Marca:* ${marca}\n• *Modelo:* ${modelo}\n• *Año:* ${anio}\n• *Motor:* ${motor}\n• *Combustible:* ${combustible}${datosTecnicosTexto}`;
-        const textoEncriptado = encodeURIComponent(mensajeOriginal);
-        
-        window.open(`https://wa.me/${TELEFONO_WHATSAPP}?text=${textoEncriptado}`, '_blank');
-        toggleWspModal();
+    if (!marca || !modelo || !anio || !motor) {
+        alert("Por favor, completa todos los datos de tu vehículo para poder agendar el turno.");
+        return;
     }
 
+    let datosTecnicosTexto = "\n\n🛠️ *Especificaciones para Taller:*\n• Filtros/Aceite: No figuran en catálogo (verificar manualmente)";
+
+    try {
+        const response = await fetch(CATALOGO_CSV_URL);
+        const csvText = await response.text();
+        
+        const parsed = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true
+        });
+
+        const catalogo = parsed.data;
+
+        // Búsqueda flexible comparando palabras claves
+        const coincidencia = catalogo.find(item => {
+            const marcaItem = String(item['Marca'] || '').toLowerCase().trim();
+            const modeloItem = String(item['Modelo'] || '').toLowerCase().trim();
+            const motorItem = String(item['Motor'] || '').toLowerCase().trim();
+
+            const matchMarca = marcaItem.includes(marca) || marca.includes(marcaItem);
+            const matchModelo = modeloItem.includes(modelo) || modelo.includes(modeloItem);
+            const matchMotor = !motor || motorItem.includes(motor) || motor.includes(motorItem);
+
+            return matchMarca && matchModelo && matchMotor;
+        });
+
+        if (coincidencia) {
+            // Función auxiliar para buscar nombres de columnas sin importar diferencias pequeñas de formato
+            const getCampo = (nombresPosibles) => {
+                const clave = Object.keys(coincidencia).find(k => 
+                    nombresPosibles.some(n => k.toLowerCase().trim() === n.toLowerCase().trim())
+                );
+                return (clave && coincidencia[clave] && coincidencia[clave].trim() !== '') ? coincidencia[clave].trim() : 'N/A';
+            };
+
+            datosTecnicosTexto = `\n\n🛠️ *Especificaciones para Taller (Catálogo):*
+• *Viscosidad:* ${getCampo(['Viscosidad'])}
+• *Capacidad:* ${getCampo(['Capacidad(L)', 'Capacidad'])} L
+• *F. Aceite:* ${getCampo(['F_Aceite', 'Filtro Aceite'])}
+• *F. Aire:* ${getCampo(['F_Aire', 'Filtro Aire'])}
+• *F. Combustible:* ${getCampo(['F_Combustible', 'Filtro Combustible'])}
+• *F. Habitáculo:* ${getCampo(['F_Habitáculo', 'Filtro Habitaculo', 'F_Habitaculo'])}
+• *Caja Auto:* ${getCampo(['Caja_Automática', 'Caja Automatica'])}`;
+        }
+    } catch (error) {
+        console.error("Error al consultar el catálogo de filtros:", error);
+    }
+
+    const mensajeOriginal = `Hola Lubricentro MDB, quiero pedir un turno para un service. \n\n📋 *Datos de mi vehículo:*\n• *Marca:* \({marca.toUpperCase()}\n• *Modelo:*\){modelo.toUpperCase()}\n• *Año:* \({anio}\n• *Motor:*\){motor.toUpperCase()}\n• *Combustible:* \({combustible}\){datosTecnicosTexto}`;
+    const textoEncriptado = encodeURIComponent(mensajeOriginal);
+    
+    window.open(`https://wa.me/\({TELEFONO_WHATSAPP}?text=\){textoEncriptado}`, '_blank');
+    toggleWspModal();
+}
     // 🔎 LÓGICA DEL BUSCADOR DE PATENTES
     async function buscarPatente() {
         const patenteBuscada = document.getElementById("patente").value.replace(/\s+/g, '').toUpperCase();
